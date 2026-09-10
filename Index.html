@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDB CineExplore Pro - Ultimate Movie, TV & Anime Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: 'var(--bg-main)',
+                        cardBg: 'var(--bg-card)',
+                        cardHover: 'var(--bg-hover)',
+                        accentColor: 'var(--accent)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #090d16;
+            --bg-card: rgba(19, 28, 49, 0.65);
+            --bg-hover: rgba(30, 41, 59, 0.8);
+            --accent: #10b981;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        .theme-light {
+            --bg-main: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-hover: rgba(226, 232, 240, 0.9);
+            --accent: #059669;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        .theme-neon {
+            --bg-main: #05050a;
+            --bg-card: rgba(20, 15, 35, 0.75);
+            --bg-hover: rgba(40, 25, 70, 0.85);
+            --accent: #ec4899;
+            --border-color: rgba(236, 72, 153, 0.2);
+            --text-main: #fdf4ff;
+            --text-muted: #d8b4fe;
+        }
+
+        .theme-gold {
+            --bg-main: #12100e;
+            --bg-card: rgba(30, 26, 20, 0.75);
+            --bg-hover: rgba(50, 42, 32, 0.85);
+            --accent: #f59e0b;
+            --border-color: rgba(245, 158, 11, 0.2);
+            --text-main: #fef3c7;
+            --text-muted: #d97706;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); }
+
+        .backdrop-gradient {
+            background: linear-gradient(to top, var(--bg-main) 5%, rgba(9,13,22,0.85) 50%, rgba(9,13,22,0.4) 100%);
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px -15px var(--accent);
+        }
+
+        .glass-dropdown {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+    <header class="border-b border-[var(--border-color)] bg-[var(--bg-main)]/80 backdrop-blur-2xl sticky top-0 z-50 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="app.resetToSearch()">
+                <div class="bg-gradient-to-tr from-[var(--accent)] to-cyan-400 text-slate-950 font-extrabold p-2.5 rounded-2xl flex items-center justify-center shadow-lg shadow-[var(--accent)]/30 group-hover:scale-110 transition duration-300">
+                    <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-[var(--accent)] via-cyan-400 to-blue-500 bg-clip-text text-transparent">CineExplore Pro</h1>
+                    <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">Ultimate TMDB Suite</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2.5 sm:space-x-3">
+                <!-- Theme Selector Dropdown -->
+                <select id="themeSelector" onchange="app.changeTheme(this.value)" class="text-xs font-semibold glass-panel px-3 py-2 rounded-xl outline-none cursor-pointer transition hover:scale-105">
+                    <option value="dark">🌙 Dark Cinematic</option>
+                    <option value="light">☀️ Light Glass</option>
+                    <option value="neon">⚡ Midnight Neon</option>
+                    <option value="gold">👑 Amber Gold</option>
+                </select>
+
+                <button onclick="app.openWatchlistModal()" class="flex items-center space-x-1.5 text-xs font-semibold glass-panel px-3.5 py-2 rounded-xl transition duration-300 shadow-sm hover:scale-105">
+                    <span>⭐ Watchlist</span>
+                    <span id="watchlistCountBadge" class="px-1.5 py-0.5 bg-[var(--accent)]/20 text-[var(--accent)] rounded-full text-[10px]">0</span>
+                </button>
+                <button onclick="app.openSettings()" class="flex items-center space-x-2 text-xs font-semibold glass-panel px-3.5 py-2 rounded-xl transition duration-300 shadow-sm hover:scale-105">
+                    <svg class="w-4 h-4 text-[var(--accent)] animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    </svg>
+                    <span id="apiKeyStatusText">API Key</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+        
+        <!-- Search & Discover View -->
+        <div id="searchView" class="space-y-8">
+            <div class="text-center space-y-3 max-w-2xl mx-auto pt-4">
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[var(--text-main)] via-[var(--text-muted)] to-[var(--accent)] bg-clip-text text-transparent">Explore Every Movie, TV Show & Anime</h2>
+            </div>
+
+            <!-- Search Bar Box -->
+            <div class="relative max-w-2xl mx-auto">
+                <div class="relative flex items-center">
+                    <span class="absolute left-4 text-[var(--text-muted)]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </span>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search movies, TV shows, anime, actors..."
+                        class="w-full glass-panel focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/20 rounded-2xl py-4 pl-12 pr-12 text-[var(--text-main)] placeholder-[var(--text-muted)] text-sm sm:text-base shadow-2xl outline-none transition duration-300"
+                        autocomplete="off"
+                    >
+                    <button id="clearSearchBtn" onclick="app.clearSearch()" class="absolute right-4 text-[var(--text-muted)] hover:text-[var(--text-main)] hidden transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Suggestions Dropdown Box -->
+                <div id="suggestionsBox" class="absolute left-0 right-0 mt-2 glass-dropdown rounded-2xl shadow-2xl max-h-96 overflow-y-auto z-40 hidden divide-y divide-[var(--border-color)] animate-fade-in">
+                    <!-- Dynamic suggestions rendered here -->
+                </div>
+            </div>
+
+            <!-- Home Screen Explore Tabs: Trending Movies, TV, Anime, Watchlist, History -->
+            <div class="space-y-4 pt-4">
+                <div class="flex flex-wrap items-center justify-center gap-2 border-b border-[var(--border-color)] pb-4">
+                    <button onclick="app.switchHomeTab('trending_all')" id="homeTabBtn_trending_all" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 bg-[var(--accent)] text-slate-950 shadow-lg shadow-[var(--accent)]/20 hover:scale-105">🔥 Trending All</button>
+                    <button onclick="app.switchHomeTab('trending_movies')" id="homeTabBtn_trending_movies" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105">🎬 Movies</button>
+                    <button onclick="app.switchHomeTab('trending_tv')" id="homeTabBtn_trending_tv" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105">📺 TV Shows</button>
+                    <button onclick="app.switchHomeTab('trending_anime')" id="homeTabBtn_trending_anime" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105">⛩️ Anime</button>
+                    <button onclick="app.switchHomeTab('watchlist')" id="homeTabBtn_watchlist" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105">⭐ Starred Watchlist</button>
+                    <button onclick="app.switchHomeTab('history')" id="homeTabBtn_history" class="px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105">🕒 Recent History</button>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <h3 id="homeSectionTitle" class="text-lg font-bold text-[var(--text-main)]">Trending Today</h3>
+                    <button onclick="app.loadHomeContent()" class="text-xs text-[var(--accent)] hover:underline flex items-center space-x-1 transition hover:opacity-80"><span>🔄 Refresh</span></button>
+                </div>
+
+                <div id="homeGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <div id="detailsView" class="space-y-8 hidden animate-fade-in">
+            <!-- Back button & quick navigation -->
+            <div class="flex items-center justify-between">
+                <button onclick="app.resetToSearch()" class="inline-flex items-center space-x-2 text-sm font-semibold glass-panel px-4 py-2.5 rounded-xl transition duration-300 shadow-sm hover:scale-105 text-[var(--text-main)] hover:text-[var(--accent)]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Back to Explore</span>
+                </button>
+                <div id="mediaTopTags" class="flex items-center gap-2">
+                    <button id="detailStarBtn" onclick="app.toggleCurrentStar()" class="inline-flex items-center space-x-2 text-xs font-semibold glass-panel px-4 py-2.5 rounded-xl transition duration-300 text-amber-400 shadow-sm hover:scale-105">
+                        <span>⭐</span> <span id="detailStarText">Star / Watchlist</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hero Backdrop Section -->
+            <div id="mediaHeroBackdrop" class="relative rounded-3xl overflow-hidden border border-[var(--border-color)] shadow-2xl bg-slate-900 bg-cover bg-center">
+                <div class="absolute inset-0 backdrop-gradient"></div>
+                <div class="relative z-10 p-6 sm:p-10 flex flex-col md:flex-row gap-8 items-start glass-panel border-0">
+                    <img id="mediaPoster" src="" alt="Poster" class="w-44 sm:w-64 rounded-2xl object-cover shadow-2xl border border-[var(--border-color)] bg-slate-800 shrink-0 aspect-[2/3]" onerror="this.src='https://placehold.co/300x450/131c31/64748b?text=No+Poster'">
+                    
+                    <div class="space-y-4 flex-1">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span id="mediaTypeBadge" class="px-3.5 py-1 bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/30 text-xs font-bold rounded-full uppercase tracking-wider backdrop-blur-md">MEDIA TYPE</span>
+                            <span id="mediaRatingBadge" class="text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-full flex items-center space-x-1 backdrop-blur-md">⭐ <span id="mediaRatingVal">0.0</span>/10 (<span id="mediaVoteCount">0</span> votes)</span>
+                            <span id="mediaStatusBadge" class="text-xs font-semibold text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-3 py-1 rounded-full backdrop-blur-md">Status</span>
+                        </div>
+                        
+                        <div>
+                            <h2 id="mediaTitle" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">Title</h2>
+                            <p id="mediaTagline" class="text-sm italic text-slate-300 mt-1">Tagline...</p>
+                        </div>
+
+                        <div id="mediaGenres" class="flex flex-wrap gap-2"></div>
+
+                        <p id="mediaOverview" class="text-sm sm:text-base text-slate-200 leading-relaxed max-w-3xl">Overview description here...</p>
+
+                        <!-- Quick Meta Chips -->
+                        <div id="mediaQuickMeta" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[var(--border-color)]">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex overflow-x-auto space-x-2 border-b border-[var(--border-color)] pb-2">
+                <button onclick="app.switchTab('overview')" id="tabBtnOverview" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 bg-[var(--accent)] text-slate-950 shadow-lg shadow-[var(--accent)]/20 shrink-0 hover:scale-105">Overview & Financials</button>
+                <button onclick="app.switchTab('cast')" id="tabBtnCast" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105">Cast & Crew</button>
+                <button onclick="app.switchTab('videos')" id="tabBtnVideos" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105">Trailers & Videos</button>
+                <button onclick="app.switchTab('seasons')" id="tabBtnSeasons" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105">Seasons & Episodes</button>
+                <button onclick="app.switchTab('providers')" id="tabBtnProviders" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105">Where to Watch</button>
+                <button onclick="app.switchTab('recommendations')" id="tabBtnRecommendations" class="px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105">Similar / Recommendations</button>
+            </div>
+
+            <!-- Tab 1: Overview & Financials -->
+            <div id="tabContentOverview" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel rounded-2xl p-6 space-y-4 shadow-xl md:col-span-2">
+                        <h3 class="font-bold text-base text-[var(--accent)] flex items-center space-x-2"><span>📊 Detailed Information</span></h3>
+                        <div id="extendedMetaGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-[var(--text-muted)]"></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 space-y-4 shadow-xl">
+                        <h3 class="font-bold text-base text-cyan-400 flex items-center space-x-2"><span>🎬 Production Companies</span></h3>
+                        <div id="productionCompaniesList" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Cast & Crew -->
+            <div id="tabContentCast" class="space-y-6 hidden">
+                <div class="glass-panel rounded-2xl p-6 shadow-xl space-y-6">
+                    <div>
+                        <h3 class="font-bold text-lg text-[var(--accent)]">Top Billed Cast</h3>
+                        <p class="text-xs text-[var(--text-muted)]">Actors and characters from the production.</p>
+                    </div>
+                    <div id="castGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Videos & Trailers -->
+            <div id="tabContentVideos" class="space-y-6 hidden">
+                <div class="glass-panel rounded-2xl p-6 shadow-xl space-y-6">
+                    <div>
+                        <h3 class="font-bold text-lg text-[var(--accent)]">Official Trailers & Clips</h3>
+                        <p class="text-xs text-[var(--text-muted)]">Trailers, teasers, and featurettes from YouTube.</p>
+                    </div>
+                    <div id="videosGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Seasons & Episodes (TV Only) -->
+            <div id="tabContentSeasons" class="space-y-6 hidden">
+                <div id="tvSeasonsSection" class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+                        <h3 class="text-lg font-bold flex items-center space-x-2"><span>📺 Available Seasons</span></h3>
+                        <span class="text-xs text-[var(--text-muted)]">Select a season to view complete episode schedules</span>
+                    </div>
+                    <div id="seasonsListContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                </div>
+
+                <!-- Season Episodes Section -->
+                <div id="seasonEpisodesSection" class="space-y-4 hidden pt-6 border-t border-[var(--border-color)]">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between glass-panel p-4 rounded-2xl gap-3">
+                        <div>
+                            <h4 id="currentSeasonTitle" class="font-bold text-base text-[var(--accent)]">Season Episodes</h4>
+                            <p class="text-xs text-[var(--text-muted)] mt-0.5">Color legend: <span class="text-emerald-400 font-semibold">■ Released</span> | <span class="text-amber-400 font-semibold">■ Upcoming / Future</span></p>
+                        </div>
+                        <button onclick="app.closeEpisodes()" class="text-xs glass-panel px-3 py-1.5 rounded-xl transition self-start sm:self-auto font-semibold">Close Episodes</button>
+                    </div>
+                    <div id="episodesListContainer" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Watch Providers -->
+            <div id="tabContentProviders" class="space-y-6 hidden">
+                <div class="glass-panel rounded-2xl p-6 shadow-xl space-y-6">
+                    <div>
+                        <h3 class="font-bold text-lg text-[var(--accent)]">Where to Watch</h3>
+                        <p class="text-xs text-[var(--text-muted)]">Streaming, rent, and purchase availability powered by JustWatch via TMDB.</p>
+                    </div>
+                    <div id="providersContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Tab 6: Similar / Recommendations -->
+            <div id="tabContentRecommendations" class="space-y-6 hidden">
+                <div class="glass-panel rounded-2xl p-6 shadow-xl space-y-6">
+                    <div>
+                        <h3 class="font-bold text-lg text-[var(--accent)]">Recommendations & Similar Titles</h3>
+                        <p class="text-xs text-[var(--text-muted)]">Titles you might also enjoy based on similar genres and themes.</p>
+                    </div>
+                    <div id="recommendationsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-[var(--border-color)] bg-[var(--bg-main)]/80 backdrop-blur-2xl py-8 mt-12 text-center text-xs text-[var(--text-muted)]">
+        <p>TMDB CineExplore Pro v3 • Powered by The Movie Database API</p>
+    </footer>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden animate-fade-in">
+        <div class="glass-dropdown border border-[var(--border-color)] rounded-3xl max-w-md w-full p-6 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold">TMDB API Configuration (.env / Local)</h3>
+                <button onclick="app.closeSettings()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] p-1 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3 text-sm text-[var(--text-muted)]">
+                <p>Enter your TMDB API v3 key. It will be saved securely in your browser's local storage for future use. Get a free key at <a href="https://www.themoviedb.org/settings/api" target="_blank" class="text-[var(--accent)] underline font-medium hover:opacity-80">themoviedb.org</a>.</p>
+                <div>
+                    <label class="block text-xs font-semibold text-[var(--text-muted)] mb-1">API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="Paste your API key here..." class="w-full glass-panel border border-[var(--border-color)] focus:border-[var(--accent)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] outline-none transition">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="app.closeSettings()" class="px-4 py-2 text-xs font-medium glass-panel rounded-xl transition">Cancel</button>
+                <button onclick="app.saveApiKey()" class="px-4 py-2 text-xs font-semibold bg-[var(--accent)] text-slate-950 rounded-xl transition shadow-lg shadow-[var(--accent)]/20 hover:scale-105">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watchlist Modal -->
+    <div id="watchlistModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden animate-fade-in">
+        <div class="glass-dropdown border border-[var(--border-color)] rounded-3xl max-w-3xl w-full p-6 space-y-6 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+                <h3 class="text-lg font-bold text-[var(--accent)] flex items-center space-x-2"><span>⭐ Starred Watchlist</span></h3>
+                <button onclick="app.closeWatchlistModal()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] p-1 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="watchlistGridContainer" class="overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 flex-1 pr-1">
+                <!-- Watchlist items -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-dropdown border border-[var(--border-color)] text-[var(--text-main)] px-4 py-3 rounded-2xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center space-x-3">
+        <span id="toastIcon" class="text-[var(--accent)] font-bold">✔</span>
+        <span id="toastMsg" class="text-sm font-medium">Notification message</span>
+    </div>
+
+    <script>
+        class TMDBApp {
+            constructor() {
+                this.apiKey = localStorage.getItem("TMDB_API_KEY") || "";
+                this.currentTheme = localStorage.getItem("TMDB_THEME") || "dark";
+                this.baseUrl = "https://api.themoviedb.org/3";
+                this.suggestions = [];
+                this.selectedIndex = -1;
+                this.currentMedia = null;
+                this.mediaType = null;
+                this.seasons = [];
+                this.debounceTimer = null;
+                
+                this.watchlist = JSON.parse(localStorage.getItem("TMDB_WATCHLIST") || "[]");
+                this.history = JSON.parse(localStorage.getItem("TMDB_HISTORY") || "[]");
+                this.homeTab = 'trending_all';
+
+                this.initElements();
+                this.initListeners();
+                this.applyTheme(this.currentTheme);
+                this.updateApiKeyStatus();
+                this.updateWatchlistBadge();
+
+                if (!this.apiKey) {
+                    setTimeout(() => this.openSettings(), 500);
+                } else {
+                    this.loadHomeContent();
+                }
+            }
+
+            initElements() {
+                this.searchInput = document.getElementById("searchInput");
+                this.clearSearchBtn = document.getElementById("clearSearchBtn");
+                this.suggestionsBox = document.getElementById("suggestionsBox");
+                this.searchView = document.getElementById("searchView");
+                this.detailsView = document.getElementById("detailsView");
+                this.settingsModal = document.getElementById("settingsModal");
+                this.watchlistModal = document.getElementById("watchlistModal");
+                this.apiKeyInput = document.getElementById("apiKeyInput");
+                this.apiKeyStatusText = document.getElementById("apiKeyStatusText");
+                this.toast = document.getElementById("toast");
+                this.themeSelector = document.getElementById("themeSelector");
+            }
+
+            initListeners() {
+                this.searchInput.addEventListener("input", (e) => {
+                    const query = e.target.value;
+                    if (query.length > 0) {
+                        this.clearSearchBtn.classList.remove("hidden");
+                    } else {
+                        this.clearSearchBtn.classList.add("hidden");
+                    }
+
+                    clearTimeout(this.debounceTimer);
+                    this.debounceTimer = setTimeout(() => {
+                        this.fetchSuggestions(query);
+                    }, 300);
+                });
+
+                this.searchInput.addEventListener("keydown", (e) => {
+                    if (this.suggestions.length === 0) return;
+
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        this.selectedIndex = Math.min(this.selectedIndex + 1, this.suggestions.length - 1);
+                        this.renderSuggestions();
+                    } else if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
+                        this.renderSuggestions();
+                    } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (this.selectedIndex >= 0 && this.selectedIndex < this.suggestions.length) {
+                            const selected = this.suggestions[this.selectedIndex];
+                            this.selectMedia(selected);
+                        }
+                    }
+                });
+            }
+
+            changeTheme(themeName) {
+                this.currentTheme = themeName;
+                localStorage.setItem("TMDB_THEME", themeName);
+                this.applyTheme(themeName);
+                this.showToast(`Switched to ${themeName} theme!`);
+            }
+
+            applyTheme(themeName) {
+                const root = document.getElementById("htmlRoot");
+                root.className = "";
+                if (themeName === "light") {
+                    root.classList.add("theme-light");
+                } else if (themeName === "neon") {
+                    root.classList.add("theme-neon");
+                } else if (themeName === "gold") {
+                    root.classList.add("theme-gold");
+                } else {
+                    root.classList.add("dark");
+                }
+                if (this.themeSelector) this.themeSelector.value = themeName;
+            }
+
+            updateApiKeyStatus() {
+                if (this.apiKey) {
+                    this.apiKeyStatusText.textContent = "API Configured";
+                    this.apiKeyStatusText.className = "text-[var(--accent)] font-semibold";
+                } else {
+                    this.apiKeyStatusText.textContent = "API Key Missing";
+                    this.apiKeyStatusText.className = "text-amber-400 font-semibold";
+                }
+            }
+
+            openSettings() {
+                this.apiKeyInput.value = this.apiKey;
+                this.settingsModal.classList.remove("hidden");
+            }
+
+            closeSettings() {
+                this.settingsModal.classList.add("hidden");
+            }
+
+            saveApiKey() {
+                const key = this.apiKeyInput.value.trim();
+                if (!key) {
+                    this.showToast("Please enter a valid TMDB API key.", "error");
+                    return;
+                }
+                this.apiKey = key;
+                localStorage.setItem("TMDB_API_KEY", key);
+                this.updateApiKeyStatus();
+                this.closeSettings();
+                this.showToast("API Key successfully saved locally!");
+                this.loadHomeContent();
+            }
+
+            showToast(msg, type = "success") {
+                const toastMsg = document.getElementById("toastMsg");
+                const toastIcon = document.getElementById("toastIcon");
+                toastMsg.textContent = msg;
+                toastIcon.textContent = type === "success" ? "✔" : "⚠";
+                this.toast.classList.remove("translate-y-20", "opacity-0");
+                setTimeout(() => {
+                    this.toast.classList.add("translate-y-20", "opacity-0");
+                }, 3000);
+            }
+
+            updateWatchlistBadge() {
+                const badge = document.getElementById("watchlistCountBadge");
+                if (badge) badge.textContent = this.watchlist.length;
+                localStorage.setItem("TMDB_WATCHLIST", JSON.stringify(this.watchlist));
+            }
+
+            isStarred(id) {
+                return this.watchlist.some(item => item.id === id);
+            }
+
+            toggleCurrentStar() {
+                if (!this.currentMedia) return;
+                const id = this.currentMedia.id;
+                const title = this.currentMedia.title || this.currentMedia.name || "Untitled";
+                const poster_path = this.currentMedia.poster_path;
+                const vote_average = this.currentMedia.vote_average;
+                const media_type = this.mediaType;
+
+                if (this.isStarred(id)) {
+                    this.watchlist = this.watchlist.filter(item => item.id !== id);
+                    this.showToast(`Removed "${title}" from watchlist.`);
+                } else {
+                    this.watchlist.push({ id, title, poster_path, vote_average, media_type });
+                    this.showToast(`Starred "${title}" and added to watchlist!`);
+                }
+                this.updateWatchlistBadge();
+                this.updateDetailStarButton();
+            }
+
+            updateDetailStarButton() {
+                if (!this.currentMedia) return;
+                const btn = document.getElementById("detailStarBtn");
+                const text = document.getElementById("detailStarText");
+                if (this.isStarred(this.currentMedia.id)) {
+                    btn.className = "inline-flex items-center space-x-2 text-xs font-semibold bg-[var(--accent)]/25 text-[var(--accent)] px-4 py-2.5 rounded-xl border border-[var(--accent)]/40 transition shadow-sm";
+                    text.textContent = "Starred in Watchlist";
+                } else {
+                    btn.className = "inline-flex items-center space-x-2 text-xs font-semibold glass-panel text-[var(--text-main)] px-4 py-2.5 rounded-xl transition shadow-sm";
+                    text.textContent = "Star / Watchlist";
+                }
+            }
+
+            addToHistory(item) {
+                const id = item.id;
+                const title = item.title || item.name || "Untitled";
+                const poster_path = item.poster_path;
+                const vote_average = item.vote_average;
+                const media_type = item.media_type || this.mediaType;
+
+                this.history = this.history.filter(h => h.id !== id);
+                this.history.unshift({ id, title, poster_path, vote_average, media_type, viewedAt: new Date().toLocaleDateString() });
+                if (this.history.length > 30) this.history.pop();
+                localStorage.setItem("TMDB_HISTORY", JSON.stringify(this.history));
+            }
+
+            openWatchlistModal() {
+                const container = document.getElementById("watchlistGridContainer");
+                let html = "";
+                if (this.watchlist.length === 0) {
+                    html = `<p class="text-xs text-[var(--text-muted)] col-span-full text-center py-12">No starred movies or TV shows in your watchlist yet.</p>`;
+                } else {
+                    this.watchlist.forEach(item => {
+                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://placehold.co/300x450/131c31/64748b?text=No+Poster';
+                        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+                        const mType = (item.media_type || 'movie').toUpperCase();
+                        html += `
+                            <div class="glass-card rounded-2xl p-3 cursor-pointer transition group flex flex-col justify-between space-y-2 shadow" onclick="app.closeWatchlistModal(); app.selectMedia({id: ${item.id}, media_type: '${item.media_type || 'movie'}'})">
+                                <img src="${poster}" class="w-full aspect-[2/3] object-cover rounded-xl bg-slate-800" onerror="this.src='https://placehold.co/300x450/131c31/64748b?text=?'">
+                                <div>
+                                    <div class="flex items-center space-x-1.5 mb-1">
+                                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent)]/20 text-[var(--accent)]">${mType}</span>
+                                        <span class="text-[10px] text-[var(--text-muted)]">⭐ ${rating}</span>
+                                    </div>
+                                    <h5 class="font-bold text-xs text-[var(--text-main)] group-hover:text-[var(--accent)] transition truncate">${item.title}</h5>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                container.innerHTML = html;
+                this.watchlistModal.classList.remove("hidden");
+            }
+
+            closeWatchlistModal() {
+                this.watchlistModal.classList.add("hidden");
+            }
+
+            switchHomeTab(tabName) {
+                this.homeTab = tabName;
+                const tabs = ['trending_all', 'trending_movies', 'trending_tv', 'trending_anime', 'watchlist', 'history'];
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`homeTabBtn_${t}`);
+                    if (btn) {
+                        if (t === tabName) {
+                            btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition duration-300 bg-[var(--accent)] text-slate-950 shadow-lg shadow-[var(--accent)]/20 hover:scale-105";
+                        } else {
+                            btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] hover:scale-105";
+                        }
+                    }
+                });
+                this.loadHomeContent();
+            }
+
+            async loadHomeContent() {
+                const titleEl = document.getElementById("homeSectionTitle");
+                const grid = document.getElementById("homeGridContainer");
+
+                if (this.homeTab === 'watchlist') {
+                    titleEl.textContent = "Starred Watchlist";
+                    this.renderGridItems(this.watchlist, grid, "No starred items in watchlist.");
+                    return;
+                }
+
+                if (this.homeTab === 'history') {
+                    titleEl.textContent = "Recently Viewed History";
+                    this.renderGridItems(this.history, grid, "No recent history found.");
+                    return;
+                }
+
+                if (!this.apiKey) {
+                    grid.innerHTML = `<p class="text-xs text-amber-400 col-span-full text-center py-8">Please configure your TMDB API key to view trending & recommendations.</p>`;
+                    return;
+                }
+
+                try {
+                    let url = "";
+                    if (this.homeTab === 'trending_all') {
+                        titleEl.textContent = "🔥 Trending All (Today)";
+                        url = `${this.baseUrl}/trending/all/day?api_key=${this.apiKey}`;
+                    } else if (this.homeTab === 'trending_movies') {
+                        titleEl.textContent = "🎬 Trending Movies (Today)";
+                        url = `${this.baseUrl}/trending/movie/day?api_key=${this.apiKey}`;
+                    } else if (this.homeTab === 'trending_tv') {
+                        titleEl.textContent = "📺 Trending TV Shows (Today)";
+                        url = `${this.baseUrl}/trending/tv/day?api_key=${this.apiKey}`;
+                    } else if (this.homeTab === 'trending_anime') {
+                        titleEl.textContent = "⛩️ Popular Anime Series";
+                        url = `${this.baseUrl}/discover/tv?api_key=${this.apiKey}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`;
+                    }
+
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    const results = (data.results || []).map(item => ({
+                        ...item,
+                        media_type: item.media_type || (this.homeTab === 'trending_movies' ? 'movie' : (this.homeTab === 'trending_tv' || this.homeTab === 'trending_anime' ? 'tv' : 'movie'))
+                    }));
+                    this.renderGridItems(results, grid, "No results found.");
+                } catch (err) {
+                    console.error("Home content fetch error:", err);
+                    grid.innerHTML = `<p class="text-xs text-rose-400 col-span-full text-center py-8">Failed to fetch trending content.</p>`;
+                }
+            }
+
+            renderGridItems(items, gridElement, emptyMsg) {
+                if (!items || items.length === 0) {
+                    gridElement.innerHTML = `<p class="text-xs text-[var(--text-muted)] col-span-full text-center py-12">${emptyMsg}</p>`;
+                    return;
+                }
+
+                let html = "";
+                items.forEach(item => {
+                    const title = item.title || item.name || "Unknown";
+                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://placehold.co/300x450/131c31/64748b?text=No+Poster';
+                    const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+                    const mType = (item.media_type || 'movie').toUpperCase();
+
+                    html += `
+                        <div onclick="app.selectMedia({id: ${item.id}, media_type: '${item.media_type || 'movie'}'})" class="glass-card rounded-2xl p-3 cursor-pointer flex flex-col justify-between space-y-2 shadow">
+                            <img src="${poster}" class="w-full aspect-[2/3] object-cover rounded-xl bg-slate-800 shadow" onerror="this.src='https://placehold.co/300x450/131c31/64748b?text=?'">
+                            <div>
+                                <div class="flex items-center space-x-1.5 mb-1">
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent)]/20 text-[var(--accent)]">${mType}</span>
+                                    <span class="text-[10px] text-[var(--text-muted)]">⭐ ${rating}</span>
+                                </div>
+                                <h5 class="font-bold text-xs text-[var(--text-main)] group-hover:text-[var(--accent)] transition truncate">${title}</h5>
+                            </div>
+                        </div>
+                    `;
+                });
+                gridElement.innerHTML = html;
+            }
+
+            async fetchSuggestions(query) {
+                if (!query || query.trim().length < 2) {
+                    this.suggestions = [];
+                    this.hideSuggestions();
+                    return;
+                }
+
+                if (!this.apiKey) {
+                    this.openSettings();
+                    return;
+                }
+
+                try {
+                    const url = `${this.baseUrl}/search/multi?api_key=${this.apiKey}&query=${encodeURIComponent(query)}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (data.results) {
+                        this.suggestions = data.results.filter(item => item.media_type === "movie" || item.media_type === "tv" || item.media_type === "person");
+                        this.selectedIndex = 0;
+                        this.renderSuggestions();
+                    } else {
+                        this.suggestions = [];
+                        this.hideSuggestions();
+                    }
+                } catch (err) {
+                    console.error("Search error:", err);
+                    this.showToast("Failed to fetch search predictions.", "error");
+                }
+            }
+
+            renderSuggestions() {
+                if (this.suggestions.length === 0) {
+                    this.hideSuggestions();
+                    return;
+                }
+
+                let html = "";
+                this.suggestions.forEach((item, idx) => {
+                    const isSelected = idx === this.selectedIndex;
+                    const title = item.title || item.name || "Unknown";
+                    const mediaType = (item.media_type || "").toUpperCase();
+                    const date = item.release_date || item.first_air_date || "";
+                    const year = date ? `(${date.split("-")[0]})` : "";
+                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : (item.profile_path ? `https://image.tmdb.org/t/p/w92${item.profile_path}` : 'https://placehold.co/92x138/131c31/64748b?text=?');
+
+                    html += `
+                        <div onclick="app.selectMediaIndex(${idx})" class="flex items-center space-x-3 p-3.5 cursor-pointer transition duration-200 ${isSelected ? 'bg-[var(--accent)]/20 border-l-4 border-[var(--accent)]' : 'hover:bg-[var(--bg-hover)]'}">
+                            <img src="${poster}" class="w-10 h-14 object-cover rounded-lg bg-slate-800 shrink-0 shadow" onerror="this.src='https://placehold.co/92x138/131c31/64748b?text=?'">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${mediaType === 'TV' ? 'bg-indigo-500/20 text-indigo-400' : (mediaType === 'MOVIE' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-amber-500/20 text-amber-400')}">${mediaType}</span>
+                                    <h4 class="text-sm font-semibold truncate text-[var(--text-main)]">${title}</h4>
+                                </div>
+                                <p class="text-xs text-[var(--text-muted)] mt-0.5">${year} • Rating: ⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                this.suggestionsBox.innerHTML = html;
+                this.suggestionsBox.classList.remove("hidden");
+            }
+
+            hideSuggestions() {
+                this.suggestionsBox.classList.add("hidden");
+            }
+
+            clearSearch() {
+                this.searchInput.value = "";
+                this.suggestions = [];
+                this.hideSuggestions();
+                this.clearSearchBtn.classList.add("hidden");
+                this.searchInput.focus();
+            }
+
+            selectMediaIndex(idx) {
+                if (idx >= 0 && idx < this.suggestions.length) {
+                    this.selectMedia(this.suggestions[idx]);
+                }
+            }
+
+            async selectMedia(item) {
+                this.hideSuggestions();
+                const mId = item.id;
+                this.mediaType = item.media_type || 'movie';
+
+                if (this.mediaType === "person") {
+                    this.showToast("Person profiles are supported via search credits.", "info");
+                    return;
+                }
+
+                if (!this.apiKey) {
+                    this.openSettings();
+                    return;
+                }
+
+                try {
+                    let endpoint = this.mediaType === "movie" ? `/movie/${mId}` : `/tv/${mId}`;
+                    const url = `${this.baseUrl}${endpoint}?api_key=${this.apiKey}&append_to_response=credits,videos,recommendations,watch/providers`;
+                    const res = await fetch(url);
+                    const details = await res.json();
+
+                    if (details.id) {
+                        this.currentMedia = details;
+                        this.addToHistory(details);
+                        this.renderMediaDetails();
+                    } else {
+                        this.showToast("Could not load media details.", "error");
+                    }
+                } catch (err) {
+                    console.error("Details fetch error:", err);
+                    this.showToast("Error retrieving details.", "error");
+                }
+            }
+
+            renderMediaDetails() {
+                this.searchView.classList.add("hidden");
+                this.detailsView.classList.remove("hidden");
+                this.switchTab('overview');
+                this.updateDetailStarButton();
+
+                const title = this.currentMedia.title || this.currentMedia.name || "Untitled";
+                const posterPath = this.currentMedia.poster_path ? `https://image.tmdb.org/t/p/w500${this.currentMedia.poster_path}` : '';
+                const backdropPath = this.currentMedia.backdrop_path ? `https://image.tmdb.org/t/p/original${this.currentMedia.backdrop_path}` : '';
+                const date = this.currentMedia.release_date || this.currentMedia.first_air_date || "N/A";
+                const rating = this.currentMedia.vote_average ? this.currentMedia.vote_average.toFixed(1) : "N/A";
+                const voteCount = this.currentMedia.vote_count ? this.currentMedia.vote_count.toLocaleString() : "0";
+                const overview = this.currentMedia.overview || "No overview available.";
+                const tagline = this.currentMedia.tagline ? `"${this.currentMedia.tagline}"` : "";
+                const status = this.currentMedia.status || "Released";
+
+                const hero = document.getElementById("mediaHeroBackdrop");
+                if (backdropPath) {
+                    hero.style.backgroundImage = `url('${backdropPath}')`;
+                } else {
+                    hero.style.backgroundImage = 'none';
+                }
+
+                document.getElementById("mediaPoster").src = posterPath || 'https://placehold.co/300x450/131c31/64748b?text=No+Poster';
+                document.getElementById("mediaTitle").textContent = title;
+                document.getElementById("mediaTagline").textContent = tagline;
+                document.getElementById("mediaTypeBadge").textContent = this.mediaType.toUpperCase();
+                document.getElementById("mediaRatingVal").textContent = rating;
+                document.getElementById("mediaVoteCount").textContent = voteCount;
+                document.getElementById("mediaStatusBadge").textContent = status;
+                document.getElementById("mediaOverview").textContent = overview;
+
+                const genresContainer = document.getElementById("mediaGenres");
+                genresContainer.innerHTML = (this.currentMedia.genres || []).map(g => `<span class="px-3 py-1 glass-panel text-[var(--text-main)] text-xs font-medium rounded-xl border border-[var(--border-color)]">${g.name}</span>`).join("");
+
+                const quickMeta = document.getElementById("mediaQuickMeta");
+                if (this.mediaType === "movie") {
+                    quickMeta.innerHTML = `
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Release Date</span><span class="text-xs font-bold text-[var(--text-main)]">${date}</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Runtime</span><span class="text-xs font-bold text-[var(--text-main)]">${this.currentMedia.runtime || 'N/A'} mins</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Budget</span><span class="text-xs font-bold text-[var(--text-main)]">$${(this.currentMedia.budget || 0).toLocaleString()}</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Revenue</span><span class="text-xs font-bold text-[var(--text-main)]">$${(this.currentMedia.revenue || 0).toLocaleString()}</span></div>
+                    `;
+                } else {
+                    quickMeta.innerHTML = `
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">First Air Date</span><span class="text-xs font-bold text-[var(--text-main)]">${date}</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Seasons</span><span class="text-xs font-bold text-[var(--text-main)]">${this.currentMedia.number_of_seasons || 0}</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Episodes</span><span class="text-xs font-bold text-[var(--text-main)]">${this.currentMedia.number_of_episodes || 0}</span></div>
+                        <div class="glass-panel p-3 rounded-xl border border-[var(--border-color)]"><span class="text-[10px] text-[var(--text-muted)] block uppercase">Original Lang</span><span class="text-xs font-bold text-[var(--text-main)] uppercase">${this.currentMedia.original_language || 'N/A'}</span></div>
+                    `;
+                }
+
+                this.renderExtendedMeta();
+                this.renderCast();
+                this.renderVideos();
+                if (this.mediaType === "tv") {
+                    this.renderSeasons();
+                }
+                this.renderProviders();
+                this.renderRecommendations();
+            }
+
+            switchTab(tabName) {
+                const tabs = ['overview', 'cast', 'videos', 'seasons', 'providers', 'recommendations'];
+                tabs.forEach(t => {
+                    const content = document.getElementById(`tabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                    const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                    if (content && btn) {
+                        if (t === tabName) {
+                            content.classList.remove("hidden");
+                            btn.className = "px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 bg-[var(--accent)] text-slate-950 shadow-lg shadow-[var(--accent)]/20 shrink-0 hover:scale-105";
+                        } else {
+                            content.classList.add("hidden");
+                            btn.className = "px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 glass-panel text-[var(--text-main)] shrink-0 hover:scale-105";
+                        }
+                    }
+                });
+
+                const seasonsBtn = document.getElementById("tabBtnSeasons");
+                if (seasonsBtn) {
+                    if (this.mediaType === "movie") {
+                        seasonsBtn.classList.add("hidden");
+                    } else {
+                        seasonsBtn.classList.remove("hidden");
+                    }
+                }
+            }
+
+            renderExtendedMeta() {
+                const container = document.getElementById("extendedMetaGrid");
+                const compContainer = document.getElementById("productionCompaniesList");
+
+                let html = `
+                    <div><strong class="text-[var(--text-muted)] block">Original Title</strong> <span class="text-[var(--text-main)] font-medium">${this.currentMedia.original_title || this.currentMedia.original_name || 'N/A'}</span></div>
+                    <div><strong class="text-[var(--text-muted)] block">Popularity Score</strong> <span class="text-[var(--text-main)] font-medium">${this.currentMedia.popularity ? this.currentMedia.popularity.toFixed(1) : 'N/A'}</span></div>
+                    <div><strong class="text-[var(--text-muted)] block">Original Language</strong> <span class="text-[var(--text-main)] font-medium uppercase">${this.currentMedia.original_language || 'N/A'}</span></div>
+                    <div><strong class="text-[var(--text-muted)] block">Adult Content Rating</strong> <span class="text-[var(--text-main)] font-medium">${this.currentMedia.adult ? 'Yes (18+)' : 'No (General)'}</span></div>
+                `;
+
+                if (this.mediaType === "movie") {
+                    html += `
+                        <div><strong class="text-[var(--text-muted)] block">Homepage Link</strong> ${this.currentMedia.homepage ? `<a href="${this.currentMedia.homepage}" target="_blank" class="text-[var(--accent)] underline truncate block">Visit Website</a>` : '<span class="text-[var(--text-muted)]">N/A</span>'}</div>
+                        <div><strong class="text-[var(--text-muted)] block">IMDb ID</strong> <span class="text-[var(--text-main)] font-medium">${this.currentMedia.imdb_id || 'N/A'}</span></div>
+                    `;
+                } else {
+                    html += `
+                        <div><strong class="text-[var(--text-muted)] block">In Production</strong> <span class="text-[var(--text-main)] font-medium">${this.currentMedia.in_production ? 'Yes' : 'No'}</span></div>
+                        <div><strong class="text-[var(--text-muted)] block">Networks</strong> <span class="text-[var(--text-main)] font-medium">${(this.currentMedia.networks || []).map(n => n.name).join(', ') || 'N/A'}</span></div>
+                    `;
+                }
+                container.innerHTML = html;
+
+                let compHtml = "";
+                const companies = this.currentMedia.production_companies || [];
+                if (companies.length === 0) {
+                    compHtml = `<p class="text-xs text-[var(--text-muted)]">No production companies listed.</p>`;
+                } else {
+                    companies.forEach(comp => {
+                        const logo = comp.logo_path ? `https://image.tmdb.org/t/p/w200${comp.logo_path}` : '';
+                        compHtml += `
+                            <div class="flex items-center space-x-3 glass-panel p-3 rounded-xl border border-[var(--border-color)]">
+                                ${logo ? `<img src="${logo}" class="w-10 h-10 object-contain bg-white/5 p-1 rounded-lg" onerror="this.style.display='none'">` : '<div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-bold text-[var(--text-muted)]">TM</div>'}
+                                <div>
+                                    <h5 class="text-xs font-bold text-[var(--text-main)]">${comp.name}</h5>
+                                    <p class="text-[10px] text-[var(--text-muted)]">${comp.origin_country || 'International'}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                compContainer.innerHTML = compHtml;
+            }
+
+            renderCast() {
+                const grid = document.getElementById("castGrid");
+                const cast = this.currentMedia.credits?.cast || [];
+                let html = "";
+
+                if (cast.length === 0) {
+                    grid.innerHTML = `<p class="text-xs text-[var(--text-muted)] col-span-full">No cast information available.</p>`;
+                    return;
+                }
+
+                cast.slice(0, 18).forEach(actor => {
+                    const profile = actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : 'https://placehold.co/185x278/131c31/64748b?text=No+Photo';
+                    html += `
+                        <div class="glass-card rounded-2xl p-3 flex flex-col space-y-2 text-center group transition">
+                            <img src="${profile}" class="w-full aspect-[2/3] object-cover rounded-xl bg-slate-800 shadow" onerror="this.src='https://placehold.co/185x278/131c31/64748b?text=?'">
+                            <div>
+                                <h5 class="text-xs font-bold text-[var(--text-main)] truncate group-hover:text-[var(--accent)] transition">${actor.name}</h5>
+                                <p class="text-[10px] text-[var(--text-muted)] truncate mt-0.5">${actor.character || 'Role'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = html;
+            }
+
+            renderVideos() {
+                const grid = document.getElementById("videosGrid");
+                const videos = this.currentMedia.videos?.results || [];
+                let html = "";
+
+                const youtubeVideos = videos.filter(v => v.site === "YouTube");
+                if (youtubeVideos.length === 0) {
+                    grid.innerHTML = `<p class="text-xs text-[var(--text-muted)] col-span-full">No video trailers or clips available.</p>`;
+                    return;
+                }
+
+                youtubeVideos.slice(0, 4).forEach(vid => {
+                    html += `
+                        <div class="glass-panel rounded-2xl overflow-hidden shadow-xl flex flex-col">
+                            <div class="aspect-video w-full bg-slate-900">
+                                <iframe src="https://www.youtube.com/embed/${vid.key}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <div class="p-4 space-y-1">
+                                <h5 class="text-sm font-bold text-[var(--text-main)] truncate">${vid.name}</h5>
+                                <p class="text-xs text-[var(--text-muted)]">${vid.type} • ${vid.size}p</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = html;
+            }
+
+            renderSeasons() {
+                this.seasons = (this.currentMedia.seasons || []).filter(s => s.season_number >= 0);
+                const container = document.getElementById("seasonsListContainer");
+                let html = "";
+
+                this.seasons.forEach((season) => {
+                    const sName = season.name || `Season ${season.season_number}`;
+                    const eps = season.episode_count || 0;
+                    const airDate = season.air_date || "TBA";
+                    const poster = season.poster_path ? `https://image.tmdb.org/t/p/w200${season.poster_path}` : 'https://placehold.co/200x300/131c31/64748b?text=Season';
+
+                    html += `
+                        <div onclick="app.loadSeasonEpisodes(${season.season_number})" class="glass-card rounded-2xl p-3.5 cursor-pointer transition group flex flex-col justify-between space-y-3">
+                            <img src="${poster}" class="w-full aspect-[2/3] object-cover rounded-xl bg-slate-800 shadow" onerror="this.src='https://placehold.co/200x300/131c31/64748b?text=Season'">
+                            <div>
+                                <h5 class="font-bold text-sm text-[var(--text-main)] group-hover:text-[var(--accent)] transition truncate">${sName}</h5>
+                                <p class="text-xs text-[var(--text-muted)] mt-0.5">${eps} episodes</p>
+                                <p class="text-[10px] text-[var(--text-muted)] mt-1">Air: ${airDate}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                document.getElementById("tvSeasonsSection").classList.remove("hidden");
+                document.getElementById("seasonEpisodesSection").classList.add("hidden");
+            }
+
+            async loadSeasonEpisodes(seasonNumber) {
+                if (!this.apiKey) return;
+
+                try {
+                    const tvId = this.currentMedia.id;
+                    const url = `${this.baseUrl}/tv/${tvId}/season/${seasonNumber}?api_key=${this.apiKey}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (data.episodes) {
+                        this.renderEpisodes(data);
+                    } else {
+                        this.showToast("Could not load episodes for this season.", "error");
+                    }
+                } catch (err) {
+                    console.error("Season details error:", err);
+                    this.showToast("Error retrieving season episodes.", "error");
+                }
+            }
+
+            renderEpisodes(seasonData) {
+                const container = document.getElementById("episodesListContainer");
+                document.getElementById("currentSeasonTitle").textContent = `${this.currentMedia.name} - ${seasonData.name || 'Season Episodes'}`;
+                
+                const today = new Date();
+                let html = "";
+
+                if (seasonData.episodes.length === 0) {
+                    html = `<div class="p-4 glass-panel rounded-2xl text-center text-xs text-[var(--text-muted)]">No episodes listed yet.</div>`;
+                } else {
+                    seasonData.episodes.forEach(ep => {
+                        const epNum = ep.episode_number;
+                        const epName = ep.name || "Untitled Episode";
+                        const airDateStr = ep.air_date;
+                        const still = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : 'https://placehold.co/300x169/131c31/64748b?text=Episode';
+                        
+                        let isReleased = false;
+                        if (airDateStr) {
+                            const epDate = new Date(airDateStr);
+                            if (epDate <= today) {
+                                isReleased = true;
+                            }
+                        }
+
+                        const dateDisplay = airDateStr ? airDateStr : "TBA / Ongoing";
+                        const statusBadge = isReleased 
+                            ? `<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold rounded-full">Released</span>`
+                            : `<span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold rounded-full">Upcoming / Future</span>`;
+
+                        const leftAccent = isReleased ? "bg-emerald-500" : "bg-amber-500";
+
+                        html += `
+                            <div class="relative glass-panel rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden transition shadow">
+                                <div class="absolute left-0 top-0 bottom-0 w-1.5 ${leftAccent}"></div>
+                                <div class="flex items-center space-x-4 pl-2 w-full sm:w-auto">
+                                    <img src="${still}" class="w-28 sm:w-36 aspect-video object-cover rounded-xl bg-slate-900 border border-[var(--border-color)] shrink-0 shadow" onerror="this.src='https://placehold.co/300x169/131c31/64748b?text=Episode'">
+                                    <div class="space-y-1 min-w-0 flex-1">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-[var(--text-muted)]">Ep ${epNum}</span>
+                                            <h5 class="text-sm font-semibold text-[var(--text-main)] truncate">${epName}</h5>
+                                        </div>
+                                        <p class="text-xs text-[var(--text-muted)]">Air Date: <span class="text-[var(--text-main)] font-medium">${dateDisplay}</span> • Runtime: ${ep.runtime || 'N/A'}m</p>
+                                        ${ep.overview ? `<p class="text-xs text-[var(--text-muted)] line-clamp-2 mt-1">${ep.overview}</p>` : ''}
+                                    </div>
+                                </div>
+                                <div class="self-start sm:self-center shrink-0">
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                container.innerHTML = html;
+                document.getElementById("seasonEpisodesSection").classList.remove("hidden");
+                document.getElementById("seasonEpisodesSection").scrollIntoView({ behavior: 'smooth' });
+            }
+
+            closeEpisodes() {
+                document.getElementById("seasonEpisodesSection").classList.add("hidden");
+            }
+
+            renderProviders() {
+                const container = document.getElementById("providersContainer");
+                const results = this.currentMedia['watch/providers']?.results || {};
+                const region = results.US || results.IN || results.GB || Object.values(results)[0] || {};
+
+                let html = "";
+                const categories = [
+                    { key: 'flatrate', title: 'Streaming (Flatrate)' },
+                    { key: 'rent', title: 'Rent' },
+                    { key: 'buy', title: 'Buy' }
+                ];
+
+                categories.forEach(cat => {
+                    const list = region[cat.key] || [];
+                    let itemsHtml = "";
+                    if (list.length === 0) {
+                        itemsHtml = `<p class="text-xs text-[var(--text-muted)]">None available</p>`;
+                    } else {
+                        list.forEach(prov => {
+                            const logo = prov.logo_path ? `https://image.tmdb.org/t/p/w92${prov.logo_path}` : '';
+                            itemsHtml += `
+                                <div class="flex items-center space-x-3 glass-panel p-2.5 rounded-xl border border-[var(--border-color)]">
+                                    ${logo ? `<img src="${logo}" class="w-8 h-8 rounded-lg object-cover" onerror="this.style.display='none'">` : '<div class="w-8 h-8 bg-slate-800 rounded-lg"></div>'}
+                                    <span class="text-xs font-semibold text-[var(--text-main)]">${prov.provider_name}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `
+                        <div class="glass-panel rounded-2xl p-5 space-y-3">
+                            <h4 class="font-bold text-sm text-[var(--accent)]">${cat.title}</h4>
+                            <div class="space-y-2">${itemsHtml}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            renderRecommendations() {
+                const grid = document.getElementById("recommendationsGrid");
+                const recs = this.currentMedia.recommendations?.results || [];
+                let html = "";
+
+                if (recs.length === 0) {
+                    grid.innerHTML = `<p class="text-xs text-[var(--text-muted)] col-span-full">No recommendations available.</p>`;
+                    return;
+                }
+
+                recs.slice(0, 10).forEach(item => {
+                    const title = item.title || item.name || "Unknown";
+                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://placehold.co/300x450/131c31/64748b?text=No+Poster';
+                    const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+
+                    html += `
+                        <div onclick="app.selectMedia(${JSON.stringify({id: item.id, media_type: item.media_type || this.mediaType}).replace(/"/g, '&quot;')})" class="glass-card rounded-2xl p-3 cursor-pointer transition group flex flex-col justify-between space-y-2 shadow">
+                            <img src="${poster}" class="w-full aspect-[2/3] object-cover rounded-xl bg-slate-800" onerror="this.src='https://placehold.co/300x450/131c31/64748b?text=?'">
+                            <div>
+                                <h5 class="font-bold text-xs text-[var(--text-main)] group-hover:text-[var(--accent)] transition truncate">${title}</h5>
+                                <p class="text-[10px] text-[var(--text-muted)] mt-0.5">⭐ ${rating}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML = html;
+            }
+
+            resetToSearch() {
+                this.detailsView.classList.add("hidden");
+                this.searchView.classList.remove("hidden");
+                this.loadHomeContent();
+                this.searchInput.focus();
+            }
+        }
+
+        const app = new TMDBApp();
+    </script>
+</body>
+</html>
+
